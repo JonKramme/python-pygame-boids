@@ -1,4 +1,5 @@
 import itertools
+import math
 import random
 import sys, pygame
 import time
@@ -14,19 +15,21 @@ class Boid():
         self.velocity = (-1+random.random()*2, -1+random.random()*2)
         self.protectedRange = 2
         self.viewRange = 20
-        self.coherenceFactor = 100
-        self.maxSpeed = 2
+        self.coherenceFactor = 1000
+        self.maxSpeed = 50
 
 
     def draw(self, screen, debug="off"):
         # print(self.position)
         pygame.draw.circle(screen, (255, 255, 255), tuple(map(int, self.position)), 2)
         if "view" in debug:
-            pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.viewRange)
+            pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.viewRange,1)
         if "protected" in debug:
             pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.protectedRange)
-        if "ID" in debug:
-            pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.protectedRange)
+        if "id" in debug:
+            labelfont = pygame.font.SysFont("Arial",15)
+            label = labelfont.render(str(self.id),True,(255,255,255))
+            screen.blit(label,tuple(map(int, self.position)))
 
     def move(self, allBoids):
         visibleBoids = self.findVisibleBoids(allBoids)
@@ -35,6 +38,7 @@ class Boid():
 
         self.velocity = self.addVector2(self.velocity, self.coherence(visibleBoids)) # + self.separation(tooCloseBoids) + self.alignment(visibleBoids)
         self.position = self.addVector2(self.position, self.limitSpeed(self.velocity))
+
     def coherence(self, visibleBoids):
         # Calculate the center position of all "visible" boids except this one, calculate direction vector
         # towards that point and scale it by the coherence Factor. Then return it
@@ -43,14 +47,18 @@ class Boid():
             percievedCenter = self.addVector2(percievedCenter, boid.position)
         if len(visibleBoids) > 1:
             percievedCenter = [x / len(visibleBoids) for x in percievedCenter]
-        percievedCenter = self.subVector2( percievedCenter,self.position)
+        #percievedCenter = self.subVector2( percievedCenter, self.position)# not needed as we already remove its own position.
         percievedCenter = [x / self.coherenceFactor for x in percievedCenter]
         return percievedCenter
 
     def separation(self,TooCloseBoids):
-        vec2 = (0,0)
+        vec2 = (0, 0)
 
+    def separation(self, tooCloseObjects):
+        pass
 
+    def alignment(self, visibleBoids):
+        pass
 
     def limitSpeed(self,vector2):
         vec = ()
@@ -62,6 +70,9 @@ class Boid():
             else:
                 vec+=x,
         return vec
+
+    def calcVec2Distance(self, pos1, pos2):
+        return math.hypot(pos1[0] - pos2[0], pos1[1] - pos2[1])
 
     def addVector2(self, v1, v2, *args):
         vecList = [v1, v2, *args]
@@ -78,20 +89,14 @@ class Boid():
             vec = tuple(map(lambda i, j: i - j, vec, x))
         return vec
 
-    def separation(self, tooCloseObjects):
-        pass
-
-    def alignment(self, visibleBoids):
-        pass
-
     def findVisibleBoids(self, allBoids):
         return [boid for boid in allBoids if
-                (abs(boid.position[0] - self.position[0] + boid.position[1] - self.position[1])) <= self.viewRange
+                self.calcVec2Distance(boid.position,self.position) <= self.viewRange
                 and boid != self]
 
     def findTooCloseObjects(self, allObjects):
         return [obj for obj in allObjects if
-                (abs(obj.position[0] - self.position[0] + obj.position[1] - self.position[1])) <= self.protectedRange
+                self.calcVec2Distance(obj.position,self.position) <= self.protectedRange
                 and obj != self]
 
 
@@ -109,7 +114,7 @@ def BoidSimulation(count):
 
         screen.fill(black)
         for boid in boids:
-            boid.draw(screen,debug="view")
+            boid.draw(screen,debug="view/id")
             boid.move(boids)
         #time.sleep(1)
 
