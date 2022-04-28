@@ -45,13 +45,13 @@ class Boid():
     def coherence(self, visibleBoids):
         # Calculate the center position of all "visible" boids except this one, calculate direction vector
         # towards that point and scale it by the coherence Factor. Then return it
-        percievedCenter = (0.0, 0.0)
+        percievedCenter = (400, 300)
         for boid in visibleBoids:
             percievedCenter = self.addVector2(percievedCenter, boid.position)
         if len(visibleBoids) > 1:
-            percievedCenter = [x / len(visibleBoids) for x in percievedCenter]
+            percievedCenter = (x / len(visibleBoids) for x in percievedCenter)
         percievedCenter = self.subVector2( percievedCenter,self.position)
-        percievedCenter = [x / self.coherenceFactor for x in percievedCenter]
+        percievedCenter = (x / self.coherenceFactor for x in percievedCenter)
         return percievedCenter
 
     def separation(self,TooCloseBoids):
@@ -86,8 +86,8 @@ class Boid():
         return vec
 
     def subVector2(self, v1, v2, *args):
-        vecList = [v1, v2, *args]
-        vec = (0, 0)
+        vec = v1
+        vecList = [v2, *args]
         for x in vecList:
             vec = tuple(map(lambda i, j: i - j, vec, x))
         return vec
