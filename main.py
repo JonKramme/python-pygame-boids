@@ -14,8 +14,8 @@ class Boid():
         self.position = pos
         self.velocity = (-1+random.random()*2, -1+random.random()*2)
         self.protectedRange = 2
-        self.viewRange = 20
-        self.coherenceFactor = 1000
+        self.viewRange = 50
+        self.coherenceFactor = 100
         self.maxSpeed = 5
 
 
@@ -37,7 +37,7 @@ class Boid():
     def move(self, allBoids):
         visibleBoids = self.findVisibleBoids(allBoids)
         tooCloseBoids = self.findTooCloseObjects(allBoids) # currently only Boids exist. If Other Objects are added
-                                                               # we will have to pass them to this function.
+                                                           # we will have to pass them to this function.
 
         self.velocity = self.limitSpeed(self.addVector2(self.velocity, self.coherence(visibleBoids))) # + self.separation(tooCloseBoids) + self.alignment(visibleBoids)
         self.position = self.addVector2(self.position,self.velocity)
@@ -45,7 +45,7 @@ class Boid():
     def coherence(self, visibleBoids):
         # Calculate the center position of all "visible" boids except this one, calculate direction vector
         # towards that point and scale it by the coherence Factor. Then return it
-        percievedCenter = (400, 300)
+        percievedCenter = (0, 0)
         for boid in visibleBoids:
             percievedCenter = self.addVector2(percievedCenter, boid.position)
         if len(visibleBoids) > 1:
@@ -117,7 +117,7 @@ def BoidSimulation(count):
 
         screen.fill(black)
         for boid in boids:
-            boid.draw(screen,debug="view/id/velocity")
+            boid.draw(screen,debug="id/velocity")
             boid.move(boids)
         #time.sleep(1)
 
