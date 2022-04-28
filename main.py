@@ -16,7 +16,7 @@ class Boid():
         self.protectedRange = 2
         self.viewRange = 20
         self.coherenceFactor = 1000
-        self.maxSpeed = 50
+        self.maxSpeed = 5
 
 
     def draw(self, screen, debug="off"):
@@ -26,6 +26,9 @@ class Boid():
             pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.viewRange,1)
         if "protected" in debug:
             pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.protectedRange)
+        if "velocity" in debug:
+            pygame.draw.line(screen, (255, 0, 0), tuple(map(int, self.position)),
+                             self.addVector2(tuple(map(int, self.position)),self.velocity))
         if "id" in debug:
             labelfont = pygame.font.SysFont("Arial",15)
             label = labelfont.render(str(self.id),True,(255,255,255))
@@ -36,18 +39,18 @@ class Boid():
         tooCloseBoids = self.findTooCloseObjects(allBoids) # currently only Boids exist. If Other Objects are added
                                                                # we will have to pass them to this function.
 
-        self.velocity = self.addVector2(self.velocity, self.coherence(visibleBoids)) # + self.separation(tooCloseBoids) + self.alignment(visibleBoids)
-        self.position = self.addVector2(self.position, self.limitSpeed(self.velocity))
+        self.velocity = self.limitSpeed(self.addVector2(self.velocity, self.coherence(visibleBoids))) # + self.separation(tooCloseBoids) + self.alignment(visibleBoids)
+        self.position = self.addVector2(self.position,self.velocity)
 
     def coherence(self, visibleBoids):
         # Calculate the center position of all "visible" boids except this one, calculate direction vector
         # towards that point and scale it by the coherence Factor. Then return it
-        percievedCenter = (0, 0)
+        percievedCenter = (0.0, 0.0)
         for boid in visibleBoids:
             percievedCenter = self.addVector2(percievedCenter, boid.position)
         if len(visibleBoids) > 1:
             percievedCenter = [x / len(visibleBoids) for x in percievedCenter]
-        #percievedCenter = self.subVector2( percievedCenter, self.position)# not needed as we already remove its own position.
+        percievedCenter = self.subVector2( percievedCenter,self.position)
         percievedCenter = [x / self.coherenceFactor for x in percievedCenter]
         return percievedCenter
 
@@ -114,7 +117,7 @@ def BoidSimulation(count):
 
         screen.fill(black)
         for boid in boids:
-            boid.draw(screen,debug="view/id")
+            boid.draw(screen,debug="view/id/velocity")
             boid.move(boids)
         #time.sleep(1)
 
