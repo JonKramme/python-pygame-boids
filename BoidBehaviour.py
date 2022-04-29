@@ -20,12 +20,6 @@ def separation(centerBoidPosition, tooCloseObjects):
         vec2 = vm.subVector2(vec2,vm.subVector2(obj.position,centerBoidPosition))
     return vec2
 
-
-
-def separation( tooCloseObjects):
-    pass
-
-
 def alignment( visibleBoids):
     pass
 

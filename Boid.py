@@ -8,6 +8,10 @@ import pygame
 
 class Boid():
     id_iterator = itertools.count()
+    useCohesion = True
+    useSeparation = True
+    useAlignment = True
+    limitSpeed = True
 
     def __init__(self, pos):
         self.id = next(Boid.id_iterator)
@@ -43,11 +47,11 @@ class Boid():
         # currently only Boids exist. If Other Objects are added
         # we will have to pass them to the function above function.
 
-        if self.useCohesion:
+        if Boid.useCohesion:
             self.velocity = vm.addVector2(self.velocity, bh.coherence(self.position,visibleBoids,self.coherenceFactor))
-        # if self.useSeparation:
+        # if Boid.useSeparation:
         #     self.velocity = vm.addVector2(self.velocity, bh.separation(tooCloseBoids))
-        # if self.useAlignment:
+        # if Boid.useAlignment:
         #     self.velocity = vm.addVector2(self.velocity, bh.alignment(visibleBoids))
         if self.limitSpeed:
             self.velocity = vm.limitVectorElements(self.velocity, self.maxSpeed)
