@@ -24,6 +24,10 @@ Planned
 - other Objects, Predators, etc.
 | Add widgets like buttons and sliders to adjust the simulation on the go.
 
+Screenshots
+-----------
+.. image:: https://github.com/JonKramme/python-pygame-boids/blob/master/docs/images/base-22-04-29.png
+.. image:: https://github.com/JonKramme/python-pygame-boids/blob/master/docs/images/base2-22-04-29.png
 
 Resources
 ---------
