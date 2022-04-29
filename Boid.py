@@ -17,7 +17,7 @@ class Boid():
         self.id = next(Boid.id_iterator)
         self.position = pos
         self.velocity = (-1 + random.random() * 2, -1 + random.random() * 2)
-        self.protectedRange = 2
+        self.protectedRange = 5
         self.viewRange = 50
         self.coherenceFactor = 100
         self.maxSpeed = 5
@@ -26,17 +26,19 @@ class Boid():
         self.useAlignment = True
         self.limitSpeed = True
 
-    def draw(self, screen, debug="off"):
-        # print(self.position)
+    def draw(self, screen, debug=()):
+        #Always draw the Boid:
         pygame.draw.circle(screen, (255, 255, 255), tuple(map(int, self.position)), 2)
-        if "view" in debug:
+
+        #Draw Debug Variants:
+        if "VIEW" in debug:
             pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.viewRange, 1)
-        if "protected" in debug:
-            pygame.draw.circle(screen, (255, 0, 0), tuple(map(int, self.position)), self.protectedRange)
-        if "velocity" in debug:
+        if "PROTECTED" in debug:
+            pygame.draw.circle(screen, (180, 0, 0), tuple(map(int, self.position)), self.protectedRange,1)
+        if "VELOCITY" in debug:
             pygame.draw.line(screen, (255, 0, 0), tuple(map(int, self.position)),
                              vm.addVector2(tuple(map(int, self.position)), self.velocity))
-        if "id" in debug:
+        if "ID" in debug:
             labelfont = pygame.font.SysFont("Arial", 15)
             label = labelfont.render(str(self.id), True, (255, 255, 255))
             screen.blit(label, tuple(map(int, self.position)))
@@ -49,8 +51,8 @@ class Boid():
 
         if Boid.useCohesion:
             self.velocity = vm.addVector2(self.velocity, bh.coherence(self.position,visibleBoids,self.coherenceFactor))
-        # if Boid.useSeparation:
-        #     self.velocity = vm.addVector2(self.velocity, bh.separation(tooCloseBoids))
+        if Boid.useSeparation:
+            self.velocity = vm.addVector2(self.velocity, bh.separation(self.position,tooCloseBoids))
         # if Boid.useAlignment:
         #     self.velocity = vm.addVector2(self.velocity, bh.alignment(visibleBoids))
         if self.limitSpeed:
